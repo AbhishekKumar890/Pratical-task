@@ -1,0 +1,75 @@
+.supplier-labour-container {
+  padding: 0;
+}
+
+.labour-section {
+  background-color: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.labour-mapping-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.labour-mapping-table th {
+  background-color: #F8FAFC;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #4A5568;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.labour-mapping-table td {
+  padding: 8px;
+  text-align: center;
+}
+
+.labour-mapping-table select,
+.labour-mapping-table input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: center;
+  background-color: var(--white);
+}
+
+.labour-mapping-table select {
+  text-align-last: center;
+}
+
+.save-labour-btn {
+  background-color: #3F3D89;
+  color: var(--white);
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 24px;
+  float: right;
+}
+
+.save-labour-btn:hover {
+  background-color: #312F6C;
+}
+
+.search-trigger {
+  padding: 8px;
+  border-radius: 6px;
+  background-color: #F0F4F8;
+  color: #4A5568;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}

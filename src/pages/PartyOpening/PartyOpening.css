@@ -1,0 +1,187 @@
+.party-opening-container {
+  padding: 0;
+  padding-bottom: 60px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-info h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2D3748;
+  margin-bottom: 2px;
+}
+
+.page-subtitle {
+  font-size: 13px;
+  color: #718096;
+}
+
+.opening-section {
+  background-color: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 16px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 12px;
+}
+
+.party-ref-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+/* Transaction Grid */
+.transaction-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.transaction-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1000px;
+}
+
+.transaction-table th {
+  background-color: #F8FAFC;
+  padding: 12px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #4A5568;
+  text-align: left;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.transaction-table td {
+  padding: 8px;
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transaction-table input,
+.transaction-table select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #E2E8F0;
+  border-radius: 4px;
+  font-size: 12px;
+  background-color: #F8FAFC;
+}
+
+.add-row-btn {
+  background-color: #EFF2F7;
+  color: #4A5568;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+}
+
+.add-row-btn:hover {
+  background-color: #E2E8F0;
+}
+
+/* Final Opening Balance Section - reused styles but simplified */
+.final-balance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.balance-card-small {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.balance-card-small h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.balance-inputs-row {
+  display: flex;
+  gap: 16px;
+}
+
+.balance-input-group {
+  flex: 1;
+}
+
+.balance-input-group label {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.balance-input-group input {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.form-footer {
+  padding: 40px 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  background-color: transparent;
+  border-top: none;
+}
+
+.btn-secondary {
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  color: #4A5568;
+  padding: 12px 32px;
+  min-width: 120px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-save {
+  background-color: #3F3D89;
+  color: var(--white);
+  padding: 12px 32px;
+  min-width: 120px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
