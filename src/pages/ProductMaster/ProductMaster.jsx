@@ -1,33 +1,68 @@
-import React, { useState } from 'react';
-import { Search, Filter, Download, Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import { Search, Filter, Download, Plus } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { newProductValidation } from '../../utils/formValidation';
+import { resetProduct, saveProduct, setProductField } from './slices/productMasterSlice';
 import './ProductMaster.css';
-
-const products = [
-  { code: 'PR001', group: 'Necklace', short: 'NEC', stock1: 'Yes', stock2: 'Yes', status: 'Active' },
-  { code: 'PR002', group: 'Bangles', short: 'BNG', stock1: 'Yes', stock2: 'Yes', status: 'Active' },
-  { code: 'PR003', group: 'Rings', short: 'RNG', stock1: 'Yes', stock2: 'Yes', status: 'Active' },
-  { code: 'PR004', group: 'Earrings', short: 'ERG', stock1: 'Yes', stock2: 'Yes', status: 'Inactive' },
-  { code: 'PR005', group: 'Pendant', short: 'PND', stock1: 'Yes', stock2: 'Yes', status: 'Active' },
-  { code: 'PR006', group: 'Chain', short: 'CHN', stock1: 'No', stock2: 'No', status: 'Active' },
-  { code: 'PR007', group: 'Bracelet', short: 'BRC', stock1: 'Yes', stock2: 'Yes', status: 'Active' },
-  { code: 'PR008', group: 'Managalsutra', short: 'MGS', stock1: 'No', stock2: 'No', status: 'Active' },
-];
+import AddProduct from './components/AddProduct';
 
 const ProductMaster = () => {
+  const dispatch = useDispatch();
+  const form = useSelector((state) => state.productMaster.form);
+  const productList = useSelector((state) => state.productMaster.productList);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeProducts, setActiveProducts] = useState(products);
-  const [toggles, setToggles] = useState({
-    active: true,
-    notManage: false,
-    loosePcs: false
-  });
+  const [searchVal, setSearchVal] = useState('');
+  const [errors, setErrors] = useState({});
 
-  const handleSearch = (e) => {
-    const searchVal = e.target.value.toLowerCase();
-    const result = products.filter(
-      (item) => item.group.toLowerCase().includes(searchVal) || item.code.toLowerCase().includes(searchVal)
-    );
-    setActiveProducts(result);
+  const filteredProducts = productList.filter((product) =>
+    [product.productCode, product.productName, product.shortName]
+      .filter(Boolean)
+      .some((value) => value.toLowerCase().includes(searchVal.toLowerCase()))
+  );
+
+  const handleOpenModal = () => {
+    setErrors({});
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setErrors({});
+    dispatch(resetProduct());
+    setIsModalOpen(false);
+  };
+
+  const handleFieldChange = (field) => (e) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    dispatch(setProductField({ field, value }));
+
+    const hasValue = typeof value === 'string' ? value.trim() !== '' : Boolean(value);
+    if (!hasValue) {
+      return;
+    }
+
+    setErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const handleSave = () => {
+    const validationResult = newProductValidation(form);
+    const errs = validationResult?.errorMessage;
+
+    if (errs) {
+      setErrors(errs);
+      return;
+    }
+
+    dispatch(saveProduct());
+    setErrors({});
+    setIsModalOpen(false);
   };
 
   return (
@@ -43,7 +78,13 @@ const ProductMaster = () => {
         <div className="action-left">
           <div className="search-input-wrapper">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search Paraties" className="search-input" onChange={handleSearch} />
+            <input
+              type="text"
+              placeholder="Search Products"
+              className="search-input"
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+            />
           </div>
           <button className="btn btn-secondary btn-filter">
             <Filter size={18} />
@@ -56,7 +97,7 @@ const ProductMaster = () => {
             <Download size={18} />
             Export
           </button>
-          <button className="btn btn-primary btn-add-product" onClick={() => setIsModalOpen(true)}>
+          <button className="btn btn-primary btn-add-product" onClick={handleOpenModal}>
             <Plus size={18} />
             Add Product
           </button>
@@ -69,118 +110,50 @@ const ProductMaster = () => {
             <thead>
               <tr style={{ background: '#F8FAFC' }}>
                 <th>Code</th>
-                <th>Group Name</th>
+                <th>Product Name</th>
                 <th>Short Name</th>
                 <th>Daily Counter Stock</th>
-                <th>Daily Counter Stock</th>
+                <th>Loose PCS Counter</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {activeProducts.map((item, index) => (
-                <tr key={index} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <td style={{ fontWeight: 600 }}>{item.code}</td>
-                  <td>{item.group}</td>
-                  <td>{item.short}</td>
-                  <td>{item.stock1}</td>
-                  <td>{item.stock2}</td>
-                  <td>
-                    <span className={`badge ${item.status.toLowerCase() === 'active' ? 'badge-active' : 'badge-inactive'}`}>
-                      {item.status}
-                    </span>
+              {filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+                    No products found. Click "Add Product" to create one.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredProducts.map((item) => (
+                  <tr key={item.productCode} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <td style={{ fontWeight: 600 }}>{item.productCode}</td>
+                    <td>{item.productName || '—'}</td>
+                    <td>{item.shortName || '—'}</td>
+                    <td>{item.dailyCounterStockNotManage ? 'No' : 'Yes'}</td>
+                    <td>{item.loosePcsDailyCounterStockManager ? 'Yes' : 'No'}</td>
+                    <td>
+                      <span className={`badge ${item.isActive ? 'badge-active' : 'badge-inactive'}`}>
+                        {item.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Add Product Modal */}
-      <>
-        {isModalOpen && (
-          <div className="modal-overlay">
-            <div
-              className="modal-container"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ maxWidth: '500px' }}
-            >
-              <div className="modal-header">
-                <h2>Add Product</h2>
-                <button className="close-btn" onClick={() => setIsModalOpen(false)}>
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="modal-body" style={{ paddingTop: '24px' }}>
-                <div className="modal-section-title" style={{ color: '#3F3D89', fontWeight: 700, fontSize: '15px', marginBottom: '20px' }}>
-                  Product Details
-                </div>
-
-                <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label>Product Name</label>
-                  <input type="text" className="form-control" placeholder="Enter Product Name" />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: '24px' }}>
-                  <label>Short Name</label>
-                  <input type="text" className="form-control" placeholder="Enter Short Name" />
-                </div>
-
-                {/* Toggle Cards */}
-                <div className="toggle-card-list" style={{ display: 'grid', gap: '12px' }}>
-                  {/* Active Toggle */}
-                  <div className="toggle-card" style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px' }}>Active</div>
-                      <div style={{ fontSize: '12px', color: '#718096' }}>Enable this product for use</div>
-                    </div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" checked={toggles.active} onChange={() => setToggles({ ...toggles, active: !toggles.active })} />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-
-                  {/* Daily Counter Not Manage Toggle */}
-                  <div className="toggle-card" style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px' }}>Daily Counter Stock Not Manage</div>
-                      <div style={{ fontSize: '12px', color: '#718096' }}>Skip daily counter stock tracking</div>
-                    </div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" checked={toggles.notManage} onChange={() => setToggles({ ...toggles, notManage: !toggles.notManage })} />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-
-                  {/* Loose PCS Toggle */}
-                  <div className="toggle-card" style={{ padding: '16px', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '14px' }}>Loose PCS Daily Counter Stock Manager</div>
-                      <div style={{ fontSize: '12px', color: '#718096' }}>Track loose pieces in daily counter</div>
-                    </div>
-                    <label className="toggle-switch">
-                      <input type="checkbox" checked={toggles.loosePcs} onChange={() => setToggles({ ...toggles, loosePcs: !toggles.loosePcs })} />
-                      <span className="slider"></span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer" style={{ marginTop: '24px' }}>
-                <button className="btn btn-secondary" onClick={() => setIsModalOpen(false)}>
-                  Cancel
-                </button>
-                <button className="btn btn-primary" onClick={() => setIsModalOpen(false)} style={{ backgroundColor: '#3F3D89', color: 'white' }}>
-                  Save
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </>
+      {isModalOpen && 
+        <AddProduct 
+          form={form}
+          handleCloseModal = {() => setIsModalOpen(false)}
+          errors={errors}
+          handleChange={handleFieldChange}
+          handleSave={handleSave}
+        />
+      }
     </div>
   );
 };

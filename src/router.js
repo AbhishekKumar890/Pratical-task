@@ -41,6 +41,10 @@ const router = createBrowserRouter([
       {
         path: '/item-master',
         element: <ItemMasterPage />
+      },
+      {
+        path: '/item-touch',
+        element: <h2>Item Touch</h2>
       }
     ]
   }

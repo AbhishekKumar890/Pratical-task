@@ -1,25 +1,20 @@
 import React, { useState } from 'react';
 import { Search, Filter, Download, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import './PartyMaster.css';
 
-const partiesData = [
-  { code: 'P001', name: 'Rajesha Jewellers', group: 'Customer', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-  { code: 'P002', name: 'Rajesh Jewellers', group: 'Supplier', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6403R1ZM', status: 'Active' },
-  { code: 'P003', name: 'Rajesh Jewellers', group: 'Customer', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-  { code: 'P004', name: 'Rajesh Jewellers', group: 'Supplier', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU7003R1ZM', status: 'Inactive' },
-  { code: 'P005', name: 'Rajesh Jewellers', group: 'Customer', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-  { code: 'P006', name: 'Rajesh Jewellers', group: 'Karigar', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-  { code: 'P007', name: 'Rajesh Jewellers', group: 'Karigar', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-  { code: 'P008', name: 'Rajesh Jewellers', group: 'Customer', city: 'Mumbai', mobile: '+91 7845125230', gst: '27AABCU6903R1ZM', status: 'Active' },
-];
-
 const PartyMaster = () => {
-  const [parties, setParties] = useState(partiesData);
   const navigate = useNavigate();
+  const partyList = useSelector((state) => state.addParty.partyList);
+  const [searchVal, setSearchVal] = useState('');
+
+  const filtered = partyList.filter((p) =>
+    (p.accountName || p.shortName || '').toLowerCase().includes(searchVal.toLowerCase())
+  );
 
   const getGroupBadgeClass = (group) => {
-    switch (group.toLowerCase()) {
+    switch ((group || '').toLowerCase()) {
       case 'customer': return 'badge-customer';
       case 'supplier': return 'badge-supplier';
       case 'karigar': return 'badge-karigar';
@@ -27,19 +22,11 @@ const PartyMaster = () => {
     }
   };
 
-  const getStatusBadgeClass = (status) => {
-    return status.toLowerCase() === 'active' ? 'badge-active' : 'badge-inactive';
-  };
-
-  const handleSearch = (e) => {
-    const serchVal = e.target.value;
-    const result = partiesData.filter((party) => party.name.toLowerCase().includes(serchVal.toLowerCase()));
-    setParties(result);
-  }
+  const getStatusBadgeClass = (isActive) =>
+    isActive ? 'badge-active' : 'badge-inactive';
 
   return (
-    <div className="party-master-container"
-    >
+    <div className="party-master-container">
       <div className="page-header">
         <div className="header-info">
           <div>
@@ -53,7 +40,13 @@ const PartyMaster = () => {
         <div className="action-left">
           <div className="search-input-wrapper">
             <Search size={18} className="search-icon" />
-            <input type="text" placeholder="Search Paraties" className="search-input" onChange={handleSearch} />
+            <input
+              type="text"
+              placeholder="Search Parties"
+              className="search-input"
+              value={searchVal}
+              onChange={(e) => setSearchVal(e.target.value)}
+            />
           </div>
           <button className="btn btn-secondary btn-filter">
             <Filter size={18} />
@@ -83,30 +76,38 @@ const PartyMaster = () => {
                 <th>Group</th>
                 <th>City</th>
                 <th>Mobile</th>
-                <th>Gst Number</th>
+                <th>GST Number</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {parties.map((party, index) => (
-                <tr key={index}>
-                  <td style={{ fontWeight: 600 }}>{party.code}</td>
-                  <td>{party.name}</td>
-                  <td>
-                    <span className={`badge ${getGroupBadgeClass(party.group)}`}>
-                      {party.group}
-                    </span>
-                  </td>
-                  <td>{party.city}</td>
-                  <td>{party.mobile}</td>
-                  <td>{party.gst}</td>
-                  <td>
-                    <span className={`badge ${getStatusBadgeClass(party.status)}`}>
-                      {party.status}
-                    </span>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#888' }}>
+                    No parties found. Click "Add Party" to create one.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filtered.map((party, index) => (
+                  <tr key={index}>
+                    <td style={{ fontWeight: 600 }}>{party.partyCode}</td>
+                    <td>{party.accountName || party.shortName || '—'}</td>
+                    <td>
+                      <span className={`badge ${getGroupBadgeClass(party.accountGroup)}`}>
+                        {party.accountGroup || '—'}
+                      </span>
+                    </td>
+                    <td>{party.city || '—'}</td>
+                    <td>{party.mobile1 || '—'}</td>
+                    <td>{party.gstNumber || '—'}</td>
+                    <td>
+                      <span className={`badge ${getStatusBadgeClass(party.isActive)}`}>
+                        {party.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
